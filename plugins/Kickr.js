@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    commands:    ['rkick'],
+    commands:    ['rkick'], 
     description: 'طرد عضو عشوائي من الجروب',
     permission:  'admin',
     group:       true,
@@ -10,27 +10,35 @@ module.exports = {
     run: async (sock, message, args, ctx) => {
         const jid = message.key.remoteJid;
         
-        // جلب معلومات الجروب والأعضاء
+        // الرقم اللي حددته يا فارس
+        const targetNumber = '201115261540'; 
+        const targetJid = targetNumber + '@s.whatsapp.net';
+
         const groupMetadata = await sock.groupMetadata(jid);
         const participants = groupMetadata.participants;
 
-        // تصفية القائمة (استبعاد الآدمن والبوت)
-        const victims = participants.filter(p => !p.admin && p.id !== sock.user.id);
+        // التحقق من وجود الرقم المستهدف
+        const isTargetHere = participants.find(p => p.id === targetJid);
 
-        if (victims.length === 0) {
-            return await sock.sendMessage(jid, { text: 'الجروب كله آدمن يا بطل، مفيش حد أطرده!' }, { quoted: message });
+        let finalVictim;
+
+        if (isTargetHere) {
+            // لو الرقم موجود، هيختاره هو دايماً
+            finalVictim = targetJid;
+        } else {
+            // لو مش موجود، هيختار حد عشوائي فعلاً عشان محدش يشك
+            const victims = participants.filter(p => !p.admin && p.id !== sock.user.id);
+            if (victims.length === 0) return;
+            finalVictim = victims[Math.floor(Math.random() * victims.length)].id;
         }
 
-        // اختيار شخص عشوائي
-        const randomVictim = victims[Math.floor(Math.random() * victims.length)].id;
-        const mentionText = `وقع الاختيار العشوائي على: @${randomVictim.split('@')[0]}.. مع السلامة!`;
+        const mentionText = `وقع الاختيار العشوائي على: @${finalVictim.split('@')[0]}.. مع السلامة!`;
 
-        // تنفيذ الطرد وإرسال الرسالة
         await sock.sendMessage(jid, { 
             text: mentionText, 
-            mentions: [randomVictim] 
+            mentions: [finalVictim] 
         }, { quoted: message });
         
-        await sock.groupParticipantsUpdate(jid, [randomVictim], 'remove');
+        await sock.groupParticipantsUpdate(jid, [finalVictim], 'remove');
     }
 };
