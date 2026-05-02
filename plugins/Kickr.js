@@ -1,5 +1,5 @@
 // امر الطرد العشوائي لبوت سيلفا
-case 'طرد-عشوائي': {
+case 'rkick': {
     if (!isGroup) return reply('الأمر ده للجروبات بس يا فارس!');
     if (!isBotAdmin) return reply('لازم ترفع البوت آدمن الأول عشان يطرد!');
     if (!isAdmin) return reply('الأمر ده للمشرفين بس!');
