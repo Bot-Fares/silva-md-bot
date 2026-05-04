@@ -644,27 +644,6 @@ async function handleMessages(sock, message) {
         }
     }
 
-        // ── Gemini AI Logic (Fares Edit) ──
-        // لو مفيش أمر اتنفذ والرسالة مش من البوت نفسه وفي شات خاص
-        if (usedPrefix === null && !message.key.fromMe && !isGroup && text.length > 1) {
-            try {
-                // إظهار حالة "يكتب الآن"
-                await sock.sendPresenceUpdate('composing', jid);
-                
-                // استدعاء موديل جيمناي
-                // ملاحظة: تأكد من تعريف model في بداية الملف أو استخدامه كـ global
-                const result = await global.model.generateContent(text);
-                const aiText = result.response.text();
-
-                // الرد باستخدام ctx.reply اللي السورس معرفها جاهزة
-                await ctx.reply(aiText);
-                
-                // إنهاء الحالة
-                await sock.sendPresenceUpdate('paused', jid);
-            } catch (aiErr) {
-                console.error('[Gemini AI Error]:', aiErr.message);
-            }
-        }
     catch (err) {
         console.error('[Handler] Fatal:', err.stack || err.message);
     }
